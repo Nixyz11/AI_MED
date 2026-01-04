@@ -25,28 +25,20 @@ logger = logging.getLogger(__name__)
 class MedicalAssistant:
     """Main medical call center assistant."""
     
-    def __init__(self, data_dir: str = "data", use_small_model: bool = True):
+    def __init__(self, data_dir: str = "data", model_name: str = "gemma:2b"):
         """
         Initialize medical assistant.
         
         Args:
             data_dir: Directory containing data files
-            use_small_model: Use small model for faster inference
+            model_name: Ollama model name (gemma:2b, llama2, mistral)
         """
         logger.info("Initializing Medical Assistant (Design 1: Intent Router)...")
         
         # Initialize components
         self.data_dir = data_dir
         
-        # Choose model based on flag
-        if use_small_model:
-            # Use tiny model for faster response
-            model_name = "TinyLlama/TinyLlama-1.1B-Chat-v1.0"
-        else:
-            # Use slightly larger model for better accuracy
-            model_name = "microsoft/DialoGPT-medium"
-        
-        logger.info(f"Loading LLM: {model_name}")
+        logger.info(f"Loading Ollama model: {model_name}")
         self.llm = LocalLLM(model_name=model_name)
         
         logger.info("Initializing intent router...")
@@ -144,13 +136,28 @@ def main():
     project_root = os.path.dirname(script_dir)
     data_dir = os.path.join(project_root, "data")
     
+    # Ask user for model choice
+    print("\n" + "="*60)
+    print("  AI_MED - Design 1: Intent Router (Ollama)")
+    print("="*60)
+    print("\nAvailable Ollama models:")
+    print("1. gemma:2b (fastest, ~1.7GB)")
+    print("2. llama2 (balanced, ~3.8GB)")
+    print("3. mistral (best quality, ~4.4GB)")
+    
+    model_choice = input("\nChoose model (1/2/3) [default: 1]: ").strip() or "1"
+    
+    models = {
+        "1": "gemma:2b",
+        "2": "llama2",
+        "3": "mistral"
+    }
+    model_name = models.get(model_choice, "gemma:2b")
+    
     # Create assistant
-    assistant = MedicalAssistant(data_dir=data_dir, use_small_model=True)
+    assistant = MedicalAssistant(data_dir=data_dir, model_name=model_name)
     
     # Ask user for interface type
-    print("\n" + "="*60)
-    print("  AI_MED - Design 1: Intent Router")
-    print("="*60)
     print("\nChoose interface:")
     print("1. Voice (recommended)")
     print("2. Text (fallback)")
