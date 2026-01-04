@@ -263,12 +263,6 @@ def get_status():
     })
 
 def run_web_ui(model_name="gemma:2b", data_dir="data", whisper_model="base", host="0.0.0.0", port=5000, debug=False):
-
-    # Alias for /api/transcribe - same as /api/audio
-@app.route('/api/transcribe', methods=['POST'])
-def transcribe():
-    """Alias for process_audio - supports /api/transcribe endpoint"""
-    return process_audio()
     """
     Run the web UI server.
     
