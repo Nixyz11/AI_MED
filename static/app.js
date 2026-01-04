@@ -32,6 +32,10 @@ let useLocalWhisper = true; // Try local Whisper first
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
   initializeApp();
+    // Delay status check to prevent UI from blocking
+  setTimeout(() => {
+    checkStatus();
+  }, 2000
 });
 
 function initializeApp() {
