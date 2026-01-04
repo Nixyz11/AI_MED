@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MedClinic - Voice Assistant</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <div class="logo">
+                <h1>🏥 MedClinic</h1>
+                <p>AI Medical Call Center</p>
+            </div>
+            <div class="status">
+                <span id="status-indicator" class="status-dot offline"></span>
+                <span id="status-text">Connecting...</span>
+            </div>
+        </header>
+
+        <!-- Conversation Display -->
+        <div class="conversation-container" id="conversation">
+            <div class="message assistant">
+                <div class="message-content">
+                    <strong>Assistant:</strong>
+                    <p>Hello! Welcome to MedClinic. I'm here to help you book appointments, answer questions about our services, and recommend specialists. How may I assist you today?</p>
+                </div>
+                <div class="message-time">Now</div>
+            </div>
+        </div>
+
+        <!-- Voice Input Area -->
+        <div class="input-container">
+            <div class="voice-controls">
+                <button id="voiceButton" class="voice-button" disabled>
+                    <div class="mic-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+                            <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                            <line x1="12" y1="19" x2="12" y2="23"></line>
+                            <line x1="8" y1="23" x2="16" y2="23"></line>
+                        </svg>
+                    </div>
+                    <span class="button-text">Press and Hold to Speak</span>
+                </button>
+                
+                <div class="listening-indicator" id="listeningIndicator">
+                    <div class="pulse"></div>
+                    <div class="pulse"></div>
+                    <div class="pulse"></div>
+                </div>
+            </div>
+
+            <!-- Text Input Fallback -->
+            <div class="text-input-container">
+                <input 
+                    type="text" 
+                    id="textInput" 
+                    placeholder="Or type your message here..." 
+                    autocomplete="off"
+                />
+                <button id="sendButton" class="send-button">
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Control Buttons -->
+        <div class="controls">
+            <button id="resetButton" class="control-button">
+                🔄 New Conversation
+            </button>
+            <button id="toggleModeButton" class="control-button">
+                🎤 Voice Mode
+            </button>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay hidden">
+        <div class="spinner"></div>
+        <p>Processing...</p>
+    </div>
+
+    <!-- Error Toast -->
+    <div id="errorToast" class="toast error hidden">
+        <span id="errorMessage">Error message</span>
+        <button onclick="hideError()">×</button>
+    </div>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>
