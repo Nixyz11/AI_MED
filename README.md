@@ -1,11 +1,12 @@
 # AI_MED - Local LLM Medical Call Center Assistant
 
 ## Overview
-An AI design lab for building and evaluating multiple LLM-based medical call center assistants. All models run **fully locally** using small HuggingFace models.
+An AI design lab for building and evaluating multiple LLM-based medical call center assistants. All models run **fully locally** using **Ollama**.
 
 ## Design Pattern 1: Intent Router (Baseline)
 This implementation uses:
-- Small local LLM for intent classification
+- **Ollama** for local LLM inference (gemma:2b, llama2, or mistral)
+- Intent classification with LLM + rule-based fallback
 - Entity extraction for booking parameters
 - Deterministic booking state machine
 - Voice-based interaction (speech-to-text + text-to-speech)
@@ -16,9 +17,9 @@ AI_MED/
 ├── data/
 │   ├── services.json          # Medical services catalog
 │   ├── availabilities.json    # Available appointment slots
-│   └── appointments.json      # Booked appointments (generated)
+│   └── appointments.json      # Booked appointments
 ├── src/
-│   ├── llm_interface.py       # Local model abstraction
+│   ├── llm_interface.py       # Ollama API wrapper
 │   ├── intent_router.py       # Design 1: Intent classification
 │   ├── booking_state.py       # Booking state machine
 │   ├── voice_ui.py            # Voice interface
@@ -27,50 +28,106 @@ AI_MED/
 │   ├── test_cases.json        # Test scenarios
 │   └── evaluator.py           # Performance evaluation
 ├── requirements.txt
+├── OLLAMA_SETUP.md           # Detailed Ollama setup guide
 └── README.md
 ```
 
-## Installation
+## Quick Start
 
-### Prerequisites
-1. Python 3.9+
-2. FFmpeg (for audio processing)
+### 1. Install Ollama
 
-### Setup
+**Linux:**
 ```bash
-# Clone repository
+curl -fsSL https://ollama.com/install.sh | sh
+```
+
+**macOS:**
+```bash
+brew install ollama
+```
+
+**Windows:**
+Download from [https://ollama.com/download](https://ollama.com/download)
+
+### 2. Start Ollama Server
+
+```bash
+ollama serve
+```
+
+### 3. Pull a Model
+
+```bash
+# Recommended for testing (fastest)
+ollama pull gemma:2b
+
+# Or for better quality
+ollama pull llama2
+ollama pull mistral
+```
+
+### 4. Install Python Dependencies
+
+```bash
 git clone https://github.com/Nixyz11/AI_MED.git
 cd AI_MED
 git checkout design1
 
-# Create virtual environment
 python -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
 
-# Install dependencies
 pip install -r requirements.txt
-
-# Download required models (automatic on first run)
 ```
 
-## Usage
+### 5. Run the Assistant
 
-### Start Voice Assistant
 ```bash
 python src/main.py
 ```
 
-The assistant will:
-1. Initialize local LLM (downloads on first run)
-2. Load medical services and availability data
-3. Start voice interface
-4. Wait for you to press the microphone button to speak
+## Usage
 
-### Interaction Flow
-- **Press and hold** the microphone button
-- **Speak** your request (e.g., "I need a cardiology appointment")
-- **Release** the button
-- The assistant will respond via voice
+### Text Interface (Recommended for Testing)
+
+```bash
+python src/main.py
+# Choose model: 1 (gemma:2b)
+# Choose interface: 2 (Text)
+```
+
+**Example conversation:**
+```
+You: I want to book an appointment
+Assistant: What type of appointment would you like to book?
+[Lists available services]
+
+You: Cardiology consultation
+Assistant: Perfect! Cardiology Consultation selected.
+What date works for you? Available dates: January 6-10, 2025.
+
+You: tomorrow at 10am
+Assistant: Great! [date] at 10:00 is available.
+Now I need your contact information. Please provide your full name.
+
+You: My name is John Smith
+Assistant: Thank you! What's your phone number?
+
+You: 555-123-4567
+Assistant: [Displays confirmation with all appointment details]
+```
+
+### Voice Interface
+
+```bash
+python src/main.py
+# Choose model: 1 (gemma:2b)
+# Choose interface: 1 (Voice)
+```
+
+- Press ENTER to start recording
+- Speak your request
+- Press ENTER when done
+- Assistant responds via voice
 
 ## Supported Intents
 
@@ -84,23 +141,24 @@ The assistant will:
 | GENERAL_QUESTION | "How much does a consultation cost?" |
 
 ## Available Services
-- Cardiology Consultation (€120, 45min)
-- Gastroenterology Consultation (€110, 45min)
-- Abdominal Ultrasound (€85, 30min)
-- Complete Blood Analysis (€45, 15min)
-- Dermatology Check-up (€95, 30min)
-- General Health Checkup (€100, 45min)
-- Orthopedic Consultation (€105, 40min)
-- Thyroid Ultrasound (€65, 20min)
 
-## Testing
+- **Cardiology Consultation** - €120, 45min
+- **Gastroenterology Consultation** - €110, 45min
+- **Abdominal Ultrasound** - €85, 30min
+- **Complete Blood Analysis** - €45, 15min
+- **Dermatology Check-up** - €95, 30min
+- **General Health Checkup** - €100, 45min
+- **Orthopedic Consultation** - €105, 40min
+- **Thyroid Ultrasound** - €65, 20min
+
+## Testing & Evaluation
 
 ```bash
 # Run test suite
 python tests/evaluator.py
 ```
 
-Evaluator measures:
+**Metrics:**
 - Intent classification accuracy
 - Entity extraction accuracy
 - Response latency
@@ -108,18 +166,33 @@ Evaluator measures:
 
 ## Technical Details
 
-### LLM Models
-Using small HuggingFace models (< 1GB):
-- **Primary**: `distilgpt2` or `TinyLlama-1.1B` for intent classification
-- **Fallback**: Rule-based classification if model unavailable
+### Ollama Integration
+
+**API Endpoints:**
+- Generate: `POST http://localhost:11434/api/generate`
+- List models: `GET http://localhost:11434/api/tags`
+
+**Models:**
+- `gemma:2b` - 1.7GB, very fast, good accuracy (~75%)
+- `llama2` - 3.8GB, balanced, better accuracy (~85%)
+- `mistral` - 4.4GB, slower, best accuracy (~90%)
+
+### Fallback Behavior
+
+If Ollama is unavailable or LLM fails:
+- Automatic fallback to **rule-based intent classification**
+- Uses keyword matching and pattern recognition
+- Maintains full functionality without LLM
 
 ### Voice Pipeline
-1. **Speech-to-Text**: Whisper tiny model (local)
-2. **Intent Processing**: Local LLM + state machine
+
+1. **Speech-to-Text**: Google Speech Recognition (Whisper support available)
+2. **Intent Processing**: Ollama LLM + state machine
 3. **Text-to-Speech**: pyttsx3 (offline TTS)
 
 ### State Management
-Booking state tracks:
+
+Booking state machine tracks:
 - Current intent
 - Collected entities (service, date, time, patient info)
 - Missing fields
@@ -128,23 +201,46 @@ Booking state tracks:
 ## Design Tradeoffs
 
 ### Advantages
-- Fast and deterministic
-- Low resource usage
-- Predictable behavior
-- Easy to debug
+- ✅ Fast and deterministic
+- ✅ Low resource usage (especially with gemma:2b)
+- ✅ Predictable behavior
+- ✅ Easy to debug
+- ✅ Works offline (fully local)
+- ✅ Automatic fallback to rules
 
 ### Limitations
-- Less natural language flexibility
-- Requires good prompt engineering
-- May miss nuanced queries
+- ⚠️ Less natural language flexibility
+- ⚠️ Requires good prompt engineering
+- ⚠️ May miss nuanced queries
+- ⚠️ Intent classification limited by model size
+
+## Model Comparison
+
+| Model | Size | Speed | Accuracy | RAM | Use Case |
+|-------|------|-------|----------|-----|----------|
+| gemma:2b | 1.7GB | ⚡⚡⚡ | 75% | 2GB | Testing, development |
+| llama2 | 3.8GB | ⚡⚡ | 85% | 4GB | Production (balanced) |
+| mistral | 4.4GB | ⚡ | 90% | 5GB | Production (quality) |
+
+## Troubleshooting
+
+See [OLLAMA_SETUP.md](OLLAMA_SETUP.md) for detailed troubleshooting guide.
+
+**Common issues:**
+- Ollama not running: `ollama serve`
+- Model not found: `ollama pull gemma:2b`
+- Slow responses: Use smaller model or reduce max_tokens
 
 ## Next Steps
-- Implement Design 2: Prompt Chain
-- Implement Design 3: Few-shot Prompting
-- Implement Design 4: Structured Output
-- Implement Design 5: RAG
-- Implement Design 6: Multi-agent Orchestrator
-- Compare all designs with standardized benchmarks
+
+- [ ] Implement Design 2: Prompt Chain
+- [ ] Implement Design 3: Few-shot Prompting
+- [ ] Implement Design 4: Structured Output
+- [ ] Implement Design 5: RAG
+- [ ] Implement Design 6: Multi-agent Orchestrator
+- [ ] Compare all designs with standardized benchmarks
+- [ ] Build web UI with voice button
+- [ ] Switch to local Whisper for STT
 
 ## License
 MIT
