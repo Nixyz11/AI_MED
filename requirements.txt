@@ -1,22 +1,11 @@
-# Core dependencies for Ollama API
-requests>=2.31.0
-
-# Voice processing
-SpeechRecognition>=3.10.0
-pyttsx3>=2.90
-openai-whisper>=20231117
-pyaudio>=0.2.14
-
-# Web framework (for voice UI)
-flask>=3.0.0
-flask-cors>=4.0.0
-
-# Data handling
-python-dateutil>=2.8.2
-
-# Testing
-pytest>=7.4.3
-
-# Optional: for advanced audio processing
-numpy>=1.24.0
-scipy>=1.11.0
+flask
+flask-cors
+openai-whisper
+pydub
+librosa
+soundfile
+scipy
+numpy
+requests
+python-dotenv
+pyttsx3
