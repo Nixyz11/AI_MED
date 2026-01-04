@@ -154,20 +154,29 @@ def main():
     }
     model_name = models.get(model_choice, "gemma:2b")
     
-    # Create assistant
-    assistant = MedicalAssistant(data_dir=data_dir, model_name=model_name)
-    
     # Ask user for interface type
     print("\nChoose interface:")
-    print("1. Voice (recommended)")
-    print("2. Text (fallback)")
+    print("1. Web UI (recommended - voice + text)")
+    print("2. Terminal Voice (press Enter to speak)")
+    print("3. Terminal Text (typing only)")
     
-    choice = input("\nEnter choice (1/2): ").strip()
+    choice = input("\nEnter choice (1/2/3): ").strip()
     
     if choice == "1":
-        assistant.run_voice_ui()
+        # Run web UI
+        from web_ui import run_web_ui
+        print("\n🚀 Starting web UI...")
+        print("📱 Open your browser to: http://localhost:5000")
+        print("\nPress Ctrl+C to stop the server\n")
+        run_web_ui(model_name=model_name, data_dir=data_dir, debug=True)
     else:
-        assistant.run_text_ui()
+        # Create assistant for terminal modes
+        assistant = MedicalAssistant(data_dir=data_dir, model_name=model_name)
+        
+        if choice == "2":
+            assistant.run_voice_ui()
+        else:
+            assistant.run_text_ui()
 
 
 if __name__ == "__main__":
