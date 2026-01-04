@@ -1,3 +1,4 @@
+/api/transcribe  /api/audio
 // Whisper Audio Recorder & Web Speech API setup
 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 const synth = window.speechSynthesis;
