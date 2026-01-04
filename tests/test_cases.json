@@ -1,0 +1,178 @@
+{
+  "test_cases": [
+    {
+      "id": 1,
+      "input": "I want to book an appointment",
+      "expected_intent": "BOOK_APPOINTMENT",
+      "expected_entities": {},
+      "description": "Basic booking intent without details"
+    },
+    {
+      "id": 2,
+      "input": "I need a cardiology consultation tomorrow at 10am",
+      "expected_intent": "BOOK_APPOINTMENT",
+      "expected_entities": {
+        "service": "cardiology_consultation",
+        "date": "tomorrow",
+        "time": "10:00"
+      },
+      "description": "Full booking with service, date, and time"
+    },
+    {
+      "id": 3,
+      "input": "What's included in the blood analysis?",
+      "expected_intent": "SERVICE_INFO",
+      "expected_entities": {
+        "service": "blood_analysis"
+      },
+      "description": "Service information request"
+    },
+    {
+      "id": 4,
+      "input": "How much does a general checkup cost?",
+      "expected_intent": "SERVICE_INFO",
+      "expected_entities": {
+        "service": "general_checkup"
+      },
+      "description": "Price information request"
+    },
+    {
+      "id": 5,
+      "input": "I've been having chest pain. Which doctor should I see?",
+      "expected_intent": "SPECIALIST_INFO",
+      "expected_entities": {},
+      "description": "Specialist recommendation for symptoms"
+    },
+    {
+      "id": 6,
+      "input": "What are your working hours?",
+      "expected_intent": "HOURS_INFO",
+      "expected_entities": {},
+      "description": "Working hours inquiry"
+    },
+    {
+      "id": 7,
+      "input": "I have a skin rash that won't go away",
+      "expected_intent": "MEDICAL_CONDITION",
+      "expected_entities": {},
+      "description": "Medical condition description"
+    },
+    {
+      "id": 8,
+      "input": "Hello, can you help me?",
+      "expected_intent": "GENERAL_QUESTION",
+      "expected_entities": {},
+      "description": "General greeting"
+    },
+    {
+      "id": 9,
+      "input": "I want to schedule a dermatology checkup for Monday at 2pm",
+      "expected_intent": "BOOK_APPOINTMENT",
+      "expected_entities": {
+        "service": "dermatology_checkup",
+        "date": "monday",
+        "time": "14:00"
+      },
+      "description": "Complete booking request"
+    },
+    {
+      "id": 10,
+      "input": "My stomach hurts after eating",
+      "expected_intent": "MEDICAL_CONDITION",
+      "expected_entities": {},
+      "description": "Digestive symptoms"
+    },
+    {
+      "id": 11,
+      "input": "How do I prepare for an abdominal ultrasound?",
+      "expected_intent": "SERVICE_INFO",
+      "expected_entities": {
+        "service": "abdominal_ultrasound"
+      },
+      "description": "Preparation information request"
+    },
+    {
+      "id": 12,
+      "input": "I need an orthopedic consultation for my knee pain",
+      "expected_intent": "BOOK_APPOINTMENT",
+      "expected_entities": {
+        "service": "orthopedic_consultation"
+      },
+      "description": "Booking with service and reason"
+    },
+    {
+      "id": 13,
+      "input": "Can I get a thyroid ultrasound on Friday?",
+      "expected_intent": "BOOK_APPOINTMENT",
+      "expected_entities": {
+        "service": "thyroid_ultrasound",
+        "date": "friday"
+      },
+      "description": "Booking with service and date"
+    },
+    {
+      "id": 14,
+      "input": "What services do you offer?",
+      "expected_intent": "SERVICE_INFO",
+      "expected_entities": {},
+      "description": "General services inquiry"
+    },
+    {
+      "id": 15,
+      "input": "I've been having joint pain in my hands",
+      "expected_intent": "MEDICAL_CONDITION",
+      "expected_entities": {},
+      "description": "Joint pain symptoms"
+    }
+  ],
+  "booking_flow_tests": [
+    {
+      "id": "BF1",
+      "conversation": [
+        {
+          "user": "I want to book an appointment",
+          "expected_response_contains": ["service", "appointment"]
+        },
+        {
+          "user": "Cardiology consultation",
+          "expected_response_contains": ["date", "January"]
+        },
+        {
+          "user": "January 6th",
+          "expected_response_contains": ["time", "available"]
+        },
+        {
+          "user": "10:00",
+          "expected_response_contains": ["name", "contact"]
+        },
+        {
+          "user": "My name is John Smith",
+          "expected_response_contains": ["phone"]
+        },
+        {
+          "user": "555-123-4567",
+          "expected_response_contains": ["confirm", "appointment"]
+        }
+      ],
+      "description": "Complete booking flow"
+    },
+    {
+      "id": "BF2",
+      "conversation": [
+        {
+          "user": "I need a blood test tomorrow at 9am",
+          "expected_response_contains": ["available", "name"]
+        },
+        {
+          "user": "Jane Doe",
+          "expected_response_contains": ["phone"]
+        },
+        {
+          "user": "555-987-6543",
+          "expected_response_contains": ["confirm"]
+        }
+      ],
+      "description": "Fast booking with initial details"
+    }
+  ]
+}
